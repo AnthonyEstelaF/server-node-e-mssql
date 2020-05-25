@@ -1,58 +1,68 @@
+import { Icon } from './icon.model';
+
 export class Marker {
-    icon = {}
+    icon:Icon;
    //Quando creo un nuovo marker e verifico quale label viene passata al costruttore, se contiene il testo
    //“Gas naturale” o “Energia elettrica” (abbreviati in Gas e Elettrica) imposto l’icona e cancello
    //l’etichetta
     constructor(public lat: number, public lng: number, public label?: string)
     {
         if (this.label.includes("Gas")) {
-            this.icon = { url: './assets/img/gas.ico' };
+            this.icon = new Icon ( './assets/img/gas.ico', 24 ); //da modificare per ogni icona
              this.label = "";
         }
         if(this.label.includes("elettrica"))
         {
-            this.icon = { url: './assets/img/electricity.ico' };
+            this.icon = new Icon ( './assets/img/electricity.ico', 24 ); //da modificare per ogni icona
+
              this.label = "";
         }
 
         if(this.label.includes("gasolio e olio conbustibile"))
         {
-            this.icon = { url: './assets/img/gasolio.ico' };
+            this.icon = new Icon ( './assets/img/gasolio.ico', 24 ); //da modificare per ogni icona
              this.label = "";
         }
         if(this.label.includes("teleriscaldamento"))
         {
-            this.icon = { url: './assets/img/teleriscaldamento-32.ico' };
+            this.icon = new Icon ( './assets/img/telericaldamento-32.ico', 24 ); //da modificare per ogni icona
+
              this.label = "";
         }
         if(this.label.includes("GPL"))
         {
-            this.icon = { url: './assets/img/gpl.ico' };
+            this.icon = new Icon ( './assets/img/gpl.ico', 24 ); //da modificare per ogni icona
+
              this.label = "";
         }
         if(this.label.includes("NULL"))
         {
-            this.icon = { url: './assets/img/null.ico' };
+            this.icon = new Icon ( './assets/img/null.ico', 24 ); //da modificare per ogni icona
+
              this.label = "";
         }
         if(this.label.includes("biomase solida"))
         {
-            this.icon = { url: './assets/img/biomassSolid-32.ico' };
+            this.icon = new Icon ( './assets/img/biomassSolid-32.ico', 24 ); //da modificare per ogni icona
+
              this.label = "";
         }
         if(this.label.includes("RSU per teleriscaldamento"))
         {
-            this.icon = { url: './assets/img/rsu-32.ico' };
+            this.icon = new Icon ( './assets/img/rsu-32.ico', 24 ); //da modificare per ogni icona
+
              this.label = "";
         }
         if(this.label.includes("biomase liquide e gassose"))
         {
-            this.icon = { url: './assets/img/biomassLiquidGas.ico' };
+            this.icon = new Icon ( './assets/img/biomassLiquidGas.ico', 24 ); //da modificare per ogni icona
+
              this.label = "";
         }
         if(this.label.includes("olio conbustibile"))
         {
-            this.icon = { url: './assets/img/oil.ico' };
+            this.icon = new Icon ( './assets/img/oil.ico', 24 ); //da modificare per ogni icona
+
              this.label = "";
         }
 

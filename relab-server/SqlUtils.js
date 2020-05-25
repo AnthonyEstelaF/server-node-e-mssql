@@ -2,6 +2,8 @@ const sql = require('mssql');
 const CC = require('./CoordConverter.js');
 
 const coordConverter =  new CC();
+
+
  
 const config = {
     user: 'PCTO',  //Vostro user name
