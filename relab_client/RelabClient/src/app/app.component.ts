@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Ci_vettore } from './models/ci_vett.model';
 import { Marker } from './models/marker.model';
+import { MouseEvent } from '@agm/core';
 
 @Component({
   selector: 'app-root',
@@ -21,6 +22,11 @@ export class AppComponent implements OnInit {
   lat: number = 45.45227445505016;
   obsCiVett : Observable<Ci_vettore[]>; //Crea un observable per ricevere i vettori energetici
   markers : Marker[] //Marker va importato
+  circleLat : number = 0; //Latitudine e longitudine iniziale del cerchio 
+  circleLng: number = 0;
+  maxRadius: number = 400; //Voglio evitare raggi troppo grossi
+  radius : number = this.maxRadius; //Memorizzo il raggio del cerchio
+
   constructor(public http: HttpClient) {
   }
 
@@ -30,7 +36,7 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.obsGeoData = this.http.get<GeoFeatureCollection>("https://3000-d8cb6215-d197-46eb-ac56-c218993a8f7d.ws-eu01.gitpod.io/");
+    this.obsGeoData = this.http.get<GeoFeatureCollection>("https://3000-d8cb6215-d197-46eb-ac56-c218993a8f7d.ws-eu01.gitpod.io");
     this.obsGeoData.subscribe(this.prepareData);
   }
 
@@ -68,8 +74,43 @@ export class AppComponent implements OnInit {
     console.log(val);
     return false;
   }
+   mapClicked($event: MouseEvent) {
+    this.circleLat = $event.coords.lat; //Queste sono le coordinate cliccate
+    this.circleLng = $event.coords.lng; //Sposto il centro del cerchio qui
+    this.lat = this.circleLat; //Sposto il centro della mappa qui
+    this.lng = this.circleLng;
+    this.zoom = 15;  //Zoom sul cerchio
+  }
+    circleRedim(newRadius : number){
+    console.log(newRadius) //posso leggere sulla console il nuovo raggio
+    this.radius = newRadius;  //Ogni volta che modifico il cerchio, ne salvo il raggio
+  }
 
+  circleDoubleClicked(circleCenter)
+  {
+    console.log(circleCenter); //Voglio ottenere solo i valori entro questo cerchio
+    console.log(this.radius);
 
+    this.circleLat = circleCenter.coords.lat; //Aggiorno le coordinate del cerchio
+    this.circleLng = circleCenter.coords.lng; //Aggiorno le coordinate del cerchio
+    
+    //Non conosco ancora le prestazioni del DB, non voglio fare ricerche troppo onerose
+    if(this.radius > this.maxRadius)
+    {
+      console.log("area selezionata troppo vasta sarà reimpostata a maxRadius");
+       this.radius = this.maxRadius;
+    }
+    console.log ("raggio in gradi " + (this.radius * 0.00001)/1.1132)
+    let raggioInGradi = (this.radius * 0.00001)/1.1132;
+//Posso riusare lo stesso observable e lo stesso metodo di gestione del metodo    
+//cambiaFoglio poichè riceverò lo stesso tipo di dati
+//Divido l'url andando a capo per questioni di leggibilità non perchè sia necessario
+    this.obsCiVett = this.http.get<Ci_vettore[]>(`https://3000-d8cb6215-d197-46eb-ac56-c218993a8f7d.ws-eu01.gitpod.io/ci_geovettore/
+    ${this.circleLat}/
+    ${this.circleLng}/
+    ${raggioInGradi}`);
+    this.obsCiVett.subscribe(this.prepareCiVettData);
 
+  }
 }
 
