@@ -26,7 +26,7 @@ export class AppComponent implements OnInit {
   circleLng: number = 0;
   maxRadius: number = 400; //Voglio evitare raggi troppo grossi
   radius : number = this.maxRadius; //Memorizzo il raggio del cerchio
-
+    serverUrl : string = "https://3000-ada8529c-3380-4845-94a7-2fffa9eb8433.ws-eu01.gitpod.io"; 
   constructor(public http: HttpClient) {
   }
 
@@ -36,17 +36,33 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.obsGeoData = this.http.get<GeoFeatureCollection>("https://3000-d8cb6215-d197-46eb-ac56-c218993a8f7d.ws-eu01.gitpod.io");
-    this.obsGeoData.subscribe(this.prepareData);
+   
   }
 
-  styleFunc = (feature) => {
+ styleFunc = (feature) => {
     return ({
       clickable: false,
-      fillColor: this.fillColor,
-      strokeWeight: 1
+      fillColor: this.avgColorMap(feature.i.media),
+      strokeWeight: 1,
+      fillOpacity : 1  //Fill opacity 1 = opaco (i numeri tra 0 e 1 sono le gradazioni di trasparenza)
     });
   }
+  avgColorMap = (media) =>
+  {
+    if(media <= 36) return "#00FF00";
+    if(36 < media && media <= 40) return "#33ff00";
+    if(40 < media && media <= 58) return "#66ff00";
+    if(58 < media && media <= 70) return "#99ff00";
+    if(70 < media && media <= 84) return "#ccff00";
+    if(84 < media && media <= 100) return "#FFFF00";
+    if(100 < media && media <= 116) return "#FFCC00";
+    if(116 < media && media <= 1032) return "#ff9900";
+    if(1032 < media && media <= 1068) return "#ff6600";
+    if(1068 < media && media <= 1948) return "#FF3300";
+    if(1948 < media && media <= 3780) return "#FF0000";
+    return "#FF0000"
+  }
+
   prepareCiVettData = (data: Ci_vettore[]) =>
   {
     let latTot = 0; //Uso queste due variabili per calcolare latitudine e longitudine media
@@ -69,7 +85,7 @@ export class AppComponent implements OnInit {
  cambiaFoglio(foglio) : boolean
   {
     let val = foglio.value; //Commenta qui
-    this.obsCiVett = this.http.get<Ci_vettore[]>(`https://3000-d8cb6215-d197-46eb-ac56-c218993a8f7d.ws-eu01.gitpod.io/ci_vettore/${val}`);  //Commenta qui
+    this.obsCiVett = this.http.get<Ci_vettore[]>(`https://3000-ada8529c-3380-4845-94a7-2fffa9eb8433.ws-eu01.gitpod.io/ci_vettore/${val}`);  //Commenta qui
     this.obsCiVett.subscribe(this.prepareCiVettData); //Commenta qui
     console.log(val);
     return false;
@@ -102,14 +118,23 @@ export class AppComponent implements OnInit {
     }
     console.log ("raggio in gradi " + (this.radius * 0.00001)/1.1132)
     let raggioInGradi = (this.radius * 0.00001)/1.1132;
-//Posso riusare lo stesso observable e lo stesso metodo di gestione del metodo    
-//cambiaFoglio poichè riceverò lo stesso tipo di dati
-//Divido l'url andando a capo per questioni di leggibilità non perchè sia necessario
-    this.obsCiVett = this.http.get<Ci_vettore[]>(`https://3000-d8cb6215-d197-46eb-ac56-c218993a8f7d.ws-eu01.gitpod.io/ci_geovettore/
+    const urlciVett = `${this.serverUrl}/ci_geovettore/
     ${this.circleLat}/
     ${this.circleLng}/
-    ${raggioInGradi}`);
+    ${raggioInGradi}`;
+
+    const urlGeoGeom = `${this.serverUrl}/geogeom/
+    ${this.circleLat}/
+    ${this.circleLng}/
+    ${raggioInGradi}`;
+    //Posso riusare lo stesso observable e lo stesso metodo di gestione del metodo cambiaFoglio
+    //poichè riceverò lo stesso tipo di dati
+    //Divido l'url andando a capo per questioni di leggibilità non perchè sia necessario
+    this.obsCiVett = this.http.get<Ci_vettore[]>(urlciVett);
     this.obsCiVett.subscribe(this.prepareCiVettData);
+
+    this.obsGeoData = this.http.get<GeoFeatureCollection>(urlGeoGeom);
+    this.obsGeoData.subscribe(this.prepareData);
 
   }
 }

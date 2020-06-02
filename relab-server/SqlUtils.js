@@ -67,4 +67,26 @@ static ciVettGeoRequest(req,res) {
         sqlRequest.query(q, (err, result) => {SqlUtils.sendCiVettResult(err,result,res)}); 
     }
 
+    static geoGeomRequest(req, res) {
+        let sqlRequest = new sql.Request();  //sqlRequest: oggetto che serve a eseguire le query
+        let x = Number(req.params.lng);
+        let y = Number(req.params.lat);
+        let r = Number(req.params.r);
+        let q = `
+        SELECT SUM(EP_H_ND) as somma, AVG(EP_H_ND) as media, [WKT] , SEZ
+        FROM [Katmai].[dbo].[intMil4326WKT]
+        WHERE EP_H_ND > 0 AND SEZ in(
+            SELECT DISTINCT SEZ
+            FROM [Katmai].[dbo].[intMil4326WKT]
+            WHERE WGS84_X > ${x} - ${r} AND 
+                  WGS84_X < ${x} + ${r} AND
+                  WGS84_Y > ${y} - ${r} AND 
+                  WGS84_Y < ${y} + ${r})
+        GROUP BY [WKT], SEZ`
+
+        //console.log(q);
+        //eseguo la query e aspetto il risultato nella callback
+        sqlRequest.query(q, (err, result) => { SqlUtils.sendQueryResults(err, result, res) });
+    }
+
 }
